@@ -7,7 +7,7 @@ namespace Tests.Fixtures
     public class ConstrutorEventoWebhook
     {
         private string _idTransacao = "tx-123";
-        private string _idContrato = "ctr-1";
+        private string? _idContrato = "ctr-1";
         private decimal? _valor = 100m;
         private DateTimeOffset? _dataPagamento = DateTimeOffset.Parse("2024-01-01T10:00:00Z");
         private string? _status = "Liquidado";

@@ -43,7 +43,7 @@ namespace Tests.Unit
         [Fact]
         public void Falha_ComNull_LancaArgumentException()
         {
-            Action act = () => ResultadoValidacao.Falha((IReadOnlyList<string>?)null);
+            Action act = () => ResultadoValidacao.Falha((IReadOnlyList<string>)null!);
 
             act.Should().Throw<ArgumentException>();
         }

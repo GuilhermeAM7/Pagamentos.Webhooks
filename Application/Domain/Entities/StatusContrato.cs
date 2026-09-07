@@ -50,7 +50,7 @@ namespace Application.Domain.Entities
 
         private void Aplicar(EventoWebhook evento, DateTimeOffset agora)
         {
-            StatusPagamento = (PagamentoStatus)evento.StatusPagamento;
+            StatusPagamento = evento.StatusPagamento!.Value;
             UltimoValor = evento.Valor!.Value;
             UltimaDataPagamento = evento.DataPagamento!.Value;
             UltimaRecepcaoEm = evento.DataRecebido;

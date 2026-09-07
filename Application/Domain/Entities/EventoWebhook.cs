@@ -10,7 +10,7 @@ namespace Application.Domain.Entities
     public class EventoWebhook
     {
         public Guid Id { get; private set; }
-        public string IdTransacao { get; private set; }
+        public string IdTransacao { get; private set; } = null!;
         public string? IdContrato { get; private set; }
         public decimal? Valor { get; private set; }
         public DateTimeOffset? DataPagamento { get; private set; }

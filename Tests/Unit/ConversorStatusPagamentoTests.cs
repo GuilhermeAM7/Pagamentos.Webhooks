@@ -32,7 +32,7 @@ namespace Tests.Unit
         [InlineData(null)]
         [InlineData("")]
         [InlineData("   ")]
-        public void TryParse_NullOuVazio_RetornaFalseEUnknown(string entrada)
+        public void TryParse_NullOuVazio_RetornaFalseEUnknown(string? entrada)
         {
             var ok = ConversorPagamentoStatus.TryParse(entrada, out var status);
 

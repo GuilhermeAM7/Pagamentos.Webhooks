@@ -59,7 +59,7 @@ namespace Tests.Unit
         [InlineData(null)]
         [InlineData("")]
         [InlineData("   ")]
-        public void IdContratoInvalido_GeraErro(string id)
+        public void IdContratoInvalido_GeraErro(string? id)
         {
             var agora = DateTimeOffset.Parse("2024-01-01T12:00:00Z");
             var v = new ValidadorWebhookPagamento(new TestTimeProvider(agora));
