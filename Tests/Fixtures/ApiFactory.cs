@@ -1,5 +1,4 @@
-﻿// Tests/Fixtures/ApiFactory.cs
-using Infrastructure.Persistence;
+﻿using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -21,7 +20,6 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     {
         builder.UseEnvironment("Testing");
 
-        // Última fonte da pilha de configuração -> vence appsettings e variáveis de ambiente.
         builder.ConfigureAppConfiguration((_, config) =>
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
@@ -29,8 +27,6 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
                 ["SegurancaWebhook:ApiKey"] = "chave-de-teste"
             }));
 
-        // O worker não agrega nada aos testes de endpoint e torna o estado do banco
-        // não-determinístico enquanto as asserções rodam.
         builder.ConfigureTestServices(servicos => servicos.RemoveAll<IHostedService>());
     }
 

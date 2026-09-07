@@ -1,5 +1,4 @@
-﻿// Endpoints/WebhookEndpoints.cs
-using System.Text.Json;
+﻿using System.Text.Json;
 using Api.Filters;
 using Application.Contracts;
 using Application.Services;

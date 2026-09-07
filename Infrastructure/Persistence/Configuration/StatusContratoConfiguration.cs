@@ -23,10 +23,8 @@ namespace Infrastructure.Persistence.Configuration
                    .HasMaxLength(30)
                    .IsRequired();
 
-            // Concorrência otimista sem sujar o domínio com propriedade de EF.
             builder.Property<uint>("Version").IsRowVersion();
 
-            // Rastreabilidade: do contrato para o evento que produziu o estado.
             builder.HasOne<EventoWebhook>()
                    .WithMany()
                    .HasForeignKey(c => c.UltimoEventoId)

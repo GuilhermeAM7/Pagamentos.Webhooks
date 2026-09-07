@@ -25,14 +25,13 @@ public sealed class ServicoProcessamentoPagamento(
         }
 
         if (evento.Status is StatusProcessamento.Concluido)
-            return;   // idempotência do efeito: reprocessar não faz nada
+            return;
 
         evento.DefinirProcessando();
         await unidadeDeTrabalho.SalvarAsync(ct);
 
         try
         {
-            // Simulação da regra de negócio pesada exigida pelo enunciado.
             await Task.Delay(ProcessamentoPesado, relogio, ct);
 
             var agora = relogio.GetUtcNow();
@@ -46,14 +45,13 @@ public sealed class ServicoProcessamentoPagamento(
 
             evento.DefinirConcluido(agora);
 
-            // Contrato e evento saem no MESMO commit.
             await unidadeDeTrabalho.SalvarAsync(ct);
 
             logger.LogInformation("Evento {EventoId} processado.", eventoId);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
-            throw;   // encerramento do host não é falha do evento
+            throw;
         }
         catch (Exception ex)
         {

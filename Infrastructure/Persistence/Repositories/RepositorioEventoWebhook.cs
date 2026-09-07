@@ -26,8 +26,6 @@ namespace Infrastructure.Persistence.Repositories
             }
             catch (DbUpdateException ex) when (EhDuplicidadeDeTransacao(ex))
             {
-                // O evento falhou na inserção mas continua rastreado como Added.
-                // Sem desanexar, o próximo SaveChanges deste escopo reenviaria o INSERT.
                 contexto.Entry(evento).State = EntityState.Detached;
 
                 var idExistente = await contexto.Eventos
@@ -37,7 +35,7 @@ namespace Infrastructure.Persistence.Repositories
                     .FirstOrDefaultAsync(ct);
 
                 if (idExistente is null)
-                    throw;   // violação de unicidade sem linha correspondente: não é o caso esperado
+                    throw;
 
                 return ResultadoInsercao.JaExistia(idExistente.Value);
             }
@@ -77,10 +75,6 @@ namespace Infrastructure.Persistence.Repositories
 
             var total = await consulta.CountAsync(ct);
 
-            // Projeção explícita: a listagem nunca carrega payload_json. Materializar a
-            // entidade inteira traria um jsonb por linha para exibir uma tabela.
-            // O desempate por Id evita que uma linha pule de página quando duas
-            // compartilham o mesmo data_recebido.
             var linhas = await consulta
                 .OrderByDescending(e => e.DataRecebido)
                 .ThenBy(e => e.Id)
@@ -102,8 +96,6 @@ namespace Infrastructure.Persistence.Repositories
                 })
                 .ToListAsync(ct);
 
-            // ToString() dos enums fica fora da consulta: com HasConversion<string>() o
-            // EF nao garante traducao dessa chamada para SQL.
             var itens = linhas.ConvertAll(l => new EventoResumoResponse(
                 l.Id,
                 l.IdTransacao,

@@ -45,9 +45,6 @@ namespace Infrastructure.Persistence.Migrations
                     ultima_recepcao_em = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     ultimo_evento_id = table.Column<Guid>(type: "uuid", nullable: false),
                     atualizado_em = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
-                    //xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
-                    // xmin é coluna de sistema do PostgreSQL e já existe em toda tabela.
-                    // O gerador do Npgsql emite DDL para ela indevidamente (efcore.pg#3854); removido manualmente.
                 },
                 constraints: table =>
                 {

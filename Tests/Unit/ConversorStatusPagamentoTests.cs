@@ -1,4 +1,4 @@
-using Application.Domain.Enums;
+﻿using Application.Domain.Enums;
 using FluentAssertions;
 using Xunit;
 
@@ -12,10 +12,8 @@ namespace Tests.Unit
         [InlineData("LIquidAdo", PagamentoStatus.Liquidado)]
         public void Parse_StringConhecidaEmQualquerCaixa_Converte(string entrada, PagamentoStatus esperado)
         {
-            // Act
             var resultado = ConversorPagamentoStatus.Parse(entrada);
 
-            // Assert
             resultado.Should().Be(esperado);
         }
 
@@ -24,10 +22,8 @@ namespace Tests.Unit
         [InlineData("algo-que-nao-existe")]
         public void TryParse_StringDesconhecida_RetornaFalseEUnknown(string entrada)
         {
-            // Act
             var ok = ConversorPagamentoStatus.TryParse(entrada, out var status);
 
-            // Assert
             ok.Should().BeFalse();
             status.Should().Be(PagamentoStatus.Unknown);
         }
@@ -38,10 +34,8 @@ namespace Tests.Unit
         [InlineData("   ")]
         public void TryParse_NullOuVazio_RetornaFalseEUnknown(string entrada)
         {
-            // Act
             var ok = ConversorPagamentoStatus.TryParse(entrada, out var status);
 
-            // Assert
             ok.Should().BeFalse();
             status.Should().Be(PagamentoStatus.Unknown);
         }
@@ -50,10 +44,8 @@ namespace Tests.Unit
         [InlineData("999")]
         public void TryParse_StringNumerica_RetornaUnknown(string entrada)
         {
-            // Act
             var ok = ConversorPagamentoStatus.TryParse(entrada, out var status);
 
-            // Assert
             ok.Should().BeFalse();
             status.Should().Be(PagamentoStatus.Unknown);
         }
@@ -61,10 +53,8 @@ namespace Tests.Unit
         [Fact]
         public void TryParse_Falha_DeixaOutParametroComoUnknown()
         {
-            // Act
             var ok = ConversorPagamentoStatus.TryParse("invalido", out var status);
 
-            // Assert
             ok.Should().BeFalse();
             status.Should().Be(PagamentoStatus.Unknown);
         }

@@ -75,8 +75,8 @@ namespace Application.Domain.Entities
             UltimoErro = erro.Length > 2000 ? erro[..2000] : erro;
 
             Status = (permanente || Tentativas >= 5)
-                ? StatusProcessamento.Falha      
-                : StatusProcessamento.Pendente;    
+                ? StatusProcessamento.Falha
+                : StatusProcessamento.Pendente;
         }
     }
 }

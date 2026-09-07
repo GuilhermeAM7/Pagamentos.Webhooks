@@ -30,20 +30,16 @@ namespace Application.Domain.Entities
         {
             GarantirEventoAplicavel(evento);
 
-            // (1) contrato errado -> bug de programacao, nao dado ruim
             if (!string.Equals(IdContrato, evento.IdContrato, StringComparison.Ordinal))
                 throw new InvalidOperationException(
                     $"Evento {evento.Id} pertence ao contrato '{evento.IdContrato}', não a '{IdContrato}'.");
 
-            // (2) este evento ja foi aplicado -> reprocessamento seguro
             if (UltimoEventoId == evento.Id)
                 return false;
 
-            // (3) pagamento mais antigo que o ja consolidado -> chegou fora de ordem
             if (evento.DataPagamento!.Value < UltimaDataPagamento)
                 return false;
 
-            // (4) empate na data -> desempata por ordem de recebimento
             if (evento.DataPagamento.Value == UltimaDataPagamento &&
                 evento.DataRecebido <= UltimaRecepcaoEm)
                 return false;

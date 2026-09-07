@@ -1,4 +1,4 @@
-using Application.Common;
+﻿using Application.Common;
 using Application.Contracts;
 using FluentAssertions;
 using System;
@@ -19,7 +19,6 @@ namespace Tests.Unit
         [Fact]
         public void RequisicaoCompletaECorreta_EhValida()
         {
-            // Arrange
             var agora = DateTimeOffset.Parse("2024-01-01T12:00:00Z");
             var prov = new TestTimeProvider(agora);
             var v = new ValidadorWebhookPagamento(prov);
@@ -31,17 +30,14 @@ namespace Tests.Unit
                 Status = "Liquidado"
             };
 
-            // Act
             var res = v.Validar(req);
 
-            // Assert
             res.IsValid.Should().BeTrue();
         }
 
         [Fact]
         public void AcumulaTodosErros_RetornaTodosErros()
         {
-            // Arrange
             var agora = DateTimeOffset.Parse("2024-01-01T12:00:00Z");
             var prov = new TestTimeProvider(agora);
             var v = new ValidadorWebhookPagamento(prov);
@@ -53,10 +49,8 @@ namespace Tests.Unit
                 Status = null
             };
 
-            // Act
             var res = v.Validar(req);
 
-            // Assert
             res.IsValid.Should().BeFalse();
             res.Erros.Should().HaveCount(4);
         }
@@ -67,15 +61,12 @@ namespace Tests.Unit
         [InlineData("   ")]
         public void IdContratoInvalido_GeraErro(string id)
         {
-            // Arrange
             var agora = DateTimeOffset.Parse("2024-01-01T12:00:00Z");
             var v = new ValidadorWebhookPagamento(new TestTimeProvider(agora));
             var req = new RequisicaoWebhookPagamento { IdContrato = id, Valor = 1m, DataPagamento = agora, Status = "Liquidado" };
 
-            // Act
             var res = v.Validar(req);
 
-            // Assert
             res.IsValid.Should().BeFalse();
             res.Erros.Should().ContainSingle(e => e.Contains("id_contrato"));
         }
@@ -84,15 +75,12 @@ namespace Tests.Unit
         [InlineData(null)]
         public void ValorNull_GeraErro(decimal? valor)
         {
-            // Arrange
             var agora = DateTimeOffset.Parse("2024-01-01T12:00:00Z");
             var v = new ValidadorWebhookPagamento(new TestTimeProvider(agora));
             var req = new RequisicaoWebhookPagamento { IdContrato = "c", Valor = valor, DataPagamento = agora, Status = "Liquidado" };
 
-            // Act
             var res = v.Validar(req);
 
-            // Assert
             res.IsValid.Should().BeFalse();
             res.Erros.Should().Contain(e => e.Contains("valor é obrigatório"));
         }
@@ -102,15 +90,12 @@ namespace Tests.Unit
         [InlineData(-10)]
         public void ValorZeroOuNegativo_GeraErroEIncluiValor(decimal valor)
         {
-            // Arrange
             var agora = DateTimeOffset.Parse("2024-01-01T12:00:00Z");
             var v = new ValidadorWebhookPagamento(new TestTimeProvider(agora));
             var req = new RequisicaoWebhookPagamento { IdContrato = "c", Valor = valor, DataPagamento = agora, Status = "Liquidado" };
 
-            // Act
             var res = v.Validar(req);
 
-            // Assert
             res.IsValid.Should().BeFalse();
             res.Erros.Should().Contain(e => e.Contains("valor deve ser maior que zero") && e.Contains(valor.ToString()));
         }
@@ -118,15 +103,12 @@ namespace Tests.Unit
         [Fact]
         public void DataPagamentoNull_GeraErro()
         {
-            // Arrange
             var agora = DateTimeOffset.Parse("2024-01-01T12:00:00Z");
             var v = new ValidadorWebhookPagamento(new TestTimeProvider(agora));
             var req = new RequisicaoWebhookPagamento { IdContrato = "c", Valor = 1m, DataPagamento = null, Status = "Liquidado" };
 
-            // Act
             var res = v.Validar(req);
 
-            // Assert
             res.IsValid.Should().BeFalse();
             res.Erros.Should().Contain(e => e.Contains("data_pagamento é obrigatória"));
         }
@@ -134,15 +116,12 @@ namespace Tests.Unit
         [Fact]
         public void DataPagamentoAlémToleranciaDeFuturo_GeraErro()
         {
-            // Arrange
             var agora = DateTimeOffset.Parse("2024-01-01T12:00:00Z");
             var v = new ValidadorWebhookPagamento(new TestTimeProvider(agora));
             var req = new RequisicaoWebhookPagamento { IdContrato = "c", Valor = 1m, DataPagamento = agora.AddMinutes(11), Status = "Liquidado" };
 
-            // Act
             var res = v.Validar(req);
 
-            // Assert
             res.IsValid.Should().BeFalse();
             res.Erros.Should().Contain(e => e.Contains("data_pagamento está no futuro"));
         }
@@ -150,15 +129,12 @@ namespace Tests.Unit
         [Fact]
         public void DataPagamentoNaBordaDaTolerancia_NaoGeraErro()
         {
-            // Arrange
             var agora = DateTimeOffset.Parse("2024-01-01T12:00:00Z");
             var v = new ValidadorWebhookPagamento(new TestTimeProvider(agora));
             var req = new RequisicaoWebhookPagamento { IdContrato = "c", Valor = 1m, DataPagamento = agora.AddMinutes(10), Status = "Liquidado" };
 
-            // Act
             var res = v.Validar(req);
 
-            // Assert
             res.IsValid.Should().BeTrue();
         }
 
@@ -168,15 +144,12 @@ namespace Tests.Unit
         [InlineData("999")]
         public void StatusInvalidos_GeramErro(string? status)
         {
-            // Arrange
             var agora = DateTimeOffset.Parse("2024-01-01T12:00:00Z");
             var v = new ValidadorWebhookPagamento(new TestTimeProvider(agora));
             var req = new RequisicaoWebhookPagamento { IdContrato = "c", Valor = 1m, DataPagamento = agora, Status = status };
 
-            // Act
             var res = v.Validar(req);
 
-            // Assert
             res.IsValid.Should().BeFalse();
             res.Erros.Should().Contain(e => e.Contains("status"));
         }

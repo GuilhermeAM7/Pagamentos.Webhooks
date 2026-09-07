@@ -1,19 +1,9 @@
-// Endpoints/EventosEndpoints.cs
-using Application.Abstractions;
+﻿using Application.Abstractions;
 using Application.Contracts;
 using Application.Domain.Enums;
 
 namespace Api.Endpoints;
 
-/// <summary>
-/// API de leitura consumida pelo painel administrativo.
-/// </summary>
-/// <remarks>
-/// Sem <c>FiltroApiKey</c> de propósito: a ApiKey autentica o <em>parceiro</em> que envia
-/// webhooks, não o operador que consulta o painel. Reaproveitá-la aqui daria ao banco
-/// parceiro acesso de leitura a todos os eventos. Em produção este grupo teria a sua
-/// própria autenticação — está no README como evolução.
-/// </remarks>
 public static class EventosEndpoints
 {
     public static IEndpointRouteBuilder MapEventosEndpoints(this IEndpointRouteBuilder app)

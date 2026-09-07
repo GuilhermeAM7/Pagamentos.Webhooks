@@ -26,17 +26,14 @@ public class IdempotenciaTests(ApiFactory fabrica) : IClassFixture<ApiFactory>
     [Fact]
     public async Task DezRequisicoesSimultaneas_MesmoIdTransacao_GravamApenasUmEvento()
     {
-        // Arrange
         var idTransacao = $"txn-{Guid.NewGuid():N}";
         var cliente = fabrica.CreateClient();
         cliente.DefaultRequestHeaders.Add("X-Api-Key", "chave-de-teste");
 
-        // Act — dispara as 10 de uma vez, sem await entre elas
         var respostas = await Task.WhenAll(
             Enumerable.Range(0, 10)
                       .Select(_ => cliente.PostAsync("/webhooks/pagamento", Corpo(idTransacao))));
 
-        // Assert
         using var escopo = fabrica.Services.CreateScope();
         var contexto = escopo.ServiceProvider.GetRequiredService<AppDbContext>();
 
@@ -53,26 +50,22 @@ public class IdempotenciaTests(ApiFactory fabrica) : IClassFixture<ApiFactory>
     [Fact]
     public async Task RequisicaoSemApiKey_Retorna401()
     {
-        var cliente = fabrica.CreateClient(); 
+        var cliente = fabrica.CreateClient();
         var resposta = await cliente.PostAsync("/webhooks/pagamento", Corpo("txn-sem-chave"));
 
         resposta.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
-
     [Fact]
     public async Task ReenvioSequencial_DevolveOMesmoEventoId()
     {
-        // Arrange
         var idTransacao = $"txn-{Guid.NewGuid():N}";
         var cliente = fabrica.CreateClient();
         cliente.DefaultRequestHeaders.Add("X-Api-Key", "chave-de-teste");
 
-        // Act
         var primeira = await cliente.PostAsync("/webhooks/pagamento", Corpo(idTransacao));
         var segunda = await cliente.PostAsync("/webhooks/pagamento", Corpo(idTransacao));
 
-        // Assert
         primeira.StatusCode.Should().Be(HttpStatusCode.Accepted);
         segunda.StatusCode.Should().Be(HttpStatusCode.OK);
 

@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -7,10 +7,6 @@ using Tests.Fixtures;
 
 namespace Tests.Integration;
 
-/// <summary>
-/// Cobre a API de leitura do painel — incluindo o requisito "Visualização de Erros":
-/// um payload rejeitado precisa aparecer na listagem com o motivo, não sumir.
-/// </summary>
 [Trait("Categoria", "Integracao")]
 public class ListagemEventosTests(ApiFactory fabrica) : IClassFixture<ApiFactory>
 {
@@ -27,12 +23,9 @@ public class ListagemEventosTests(ApiFactory fabrica) : IClassFixture<ApiFactory
     [Fact]
     public async Task PayloadInvalido_ApareceNaListagemComOMotivoDaFalha()
     {
-        // Arrange — valor negativo e id_contrato ausente: quebra a regra de negócio,
-        // mas o evento precisa ser GRAVADO para o painel poder exibi-lo.
         var idTransacao = $"txn-inv-{Guid.NewGuid():N}";
         var cliente = ClienteAutenticado();
 
-        // Act
         var recebimento = await cliente.PostAsync("/webhooks/pagamento", Json(
             $$"""
             {"id_transacao":"{{idTransacao}}","valor":-50,
@@ -42,7 +35,6 @@ public class ListagemEventosTests(ApiFactory fabrica) : IClassFixture<ApiFactory
         var pagina = await cliente.GetFromJsonAsync<PaginaEventos>(
             "/api/eventos?status=Falha&tamanhoPagina=100");
 
-        // Assert
         recebimento.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
 
         var linha = pagina!.Itens.Should().ContainSingle(e => e.IdTransacao == idTransacao).Subject;
@@ -54,7 +46,6 @@ public class ListagemEventosTests(ApiFactory fabrica) : IClassFixture<ApiFactory
     [Fact]
     public async Task FiltroPorContrato_NaoDevolveEventosDeOutroContrato()
     {
-        // Arrange
         var contrato = $"ctr-{Guid.NewGuid():N}";
         var cliente = ClienteAutenticado();
 
@@ -70,11 +61,9 @@ public class ListagemEventosTests(ApiFactory fabrica) : IClassFixture<ApiFactory
              "data_pagamento":"2026-09-05T10:00:00Z","status":"Liquidado"}
             """));
 
-        // Act
         var pagina = await cliente.GetFromJsonAsync<PaginaEventos>(
             $"/api/eventos?idContrato={contrato}");
 
-        // Assert
         pagina!.Itens.Should().OnlyContain(e => e.IdContrato == contrato);
         pagina.Itens.Should().HaveCount(1);
     }
@@ -82,7 +71,6 @@ public class ListagemEventosTests(ApiFactory fabrica) : IClassFixture<ApiFactory
     [Fact]
     public async Task Detalhe_DevolveOPayloadOriginalComoJsonEstruturado()
     {
-        // Arrange
         var idTransacao = $"txn-{Guid.NewGuid():N}";
         var cliente = ClienteAutenticado();
 
@@ -94,11 +82,9 @@ public class ListagemEventosTests(ApiFactory fabrica) : IClassFixture<ApiFactory
 
         var eventoId = (await recebimento.Content.ReadFromJsonAsync<RespostaWebhook>())!.EventoId;
 
-        // Act — o header Location do 202 precisa apontar para uma rota que existe.
         var localizacao = recebimento.Headers.Location!.ToString();
         var detalhe = await cliente.GetFromJsonAsync<DetalheEvento>(localizacao);
 
-        // Assert
         localizacao.Should().Be($"/api/eventos/{eventoId}");
         detalhe!.IdTransacao.Should().Be(idTransacao);
 

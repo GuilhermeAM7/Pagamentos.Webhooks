@@ -28,7 +28,7 @@ namespace Infrastructure.Persistence.Configuration
                    .HasMaxLength(30)
                    .IsRequired();
 
-            builder.Property(e => e.Status)              
+            builder.Property(e => e.Status)
                    .HasConversion<string>()
                    .HasMaxLength(20)
                    .IsRequired();
@@ -45,7 +45,6 @@ namespace Infrastructure.Persistence.Configuration
 
             builder.HasIndex(e => e.IdContrato);
 
-            // Dashboard (status + mais recentes) e reconciliador (status + parados).
             builder.HasIndex(e => new { e.Status, e.DataRecebido })
                    .IsDescending(false, true);
         }

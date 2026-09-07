@@ -1,5 +1,4 @@
-﻿// Services/ServicoRecebimentoWebhook.cs
-using Application.Abstractions;
+﻿using Application.Abstractions;
 using Application.Contracts;
 using Application.Domain.Entities;
 using Microsoft.Extensions.Logging;

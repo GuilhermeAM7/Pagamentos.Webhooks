@@ -6,9 +6,9 @@ namespace Application.Contracts
 {
     public enum SituacaoRecebimento
     {
-        Aceito,      // novo, válido, vai ser processado
-        Duplicado,   // id_transacao já recebido antes
-        Rejeitado    // gravado, mas reprovado na validação
+        Aceito,
+        Duplicado,
+        Rejeitado
     }
 
     public sealed record ResultadoRecebimento(

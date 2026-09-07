@@ -1,12 +1,8 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using Application.Domain.Entities;
 
 namespace Application.Contracts;
 
-/// <summary>
-/// Detalhe de um evento. Diferente do resumo, inclui o corpo original recebido —
-/// é o que permite auditar exatamente o que o parceiro mandou quando algo falhou.
-/// </summary>
 public sealed record EventoDetalheResponse(
     Guid Id,
     string IdTransacao,
@@ -35,7 +31,5 @@ public sealed record EventoDetalheResponse(
         evento.StatusPagamento?.ToString(),
         evento.Tentativas,
         evento.UltimoErro,
-        // O payload é devolvido como JSON, não como string escapada: o corpo foi gravado
-        // íntegro em jsonb, devolvê-lo entre aspas obrigaria o painel a fazer parse duas vezes.
         JsonSerializer.Deserialize<JsonElement>(evento.PayloadJson));
 }
