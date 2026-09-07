@@ -10,7 +10,8 @@ using Tests.Fixtures;
 namespace Tests.Integration;
 
 [Trait("Categoria", "Integracao")]
-public class IdempotenciaTests(ApiFactory fabrica) : IClassFixture<ApiFactory>
+[Collection(ColecaoIntegracao.Nome)]
+public class IdempotenciaTests(ApiFactory fabrica)
 {
     private static StringContent Corpo(string idTransacao) => new(
         $$"""

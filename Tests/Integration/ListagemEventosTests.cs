@@ -8,7 +8,8 @@ using Tests.Fixtures;
 namespace Tests.Integration;
 
 [Trait("Categoria", "Integracao")]
-public class ListagemEventosTests(ApiFactory fabrica) : IClassFixture<ApiFactory>
+[Collection(ColecaoIntegracao.Nome)]
+public class ListagemEventosTests(ApiFactory fabrica)
 {
     private HttpClient ClienteAutenticado()
     {
