@@ -1,0 +1,61 @@
+@host = http://localhost:5213
+
+### 1. Evento válido -> espera 202 Accepted
+POST {{host}}/webhooks/pagamento
+Content-Type: application/json
+X-Api-Key: chave-local-de-desenvolvimento
+
+{
+  "id_transacao": "txn-006",
+  "id_contrato": "ctr-100",
+  "valor": 1500.50,
+  "data_pagamento": "2026-09-05T10:00:00Z",
+  "status": "Liquidado"
+}
+
+### 2. Mesmo id_transacao -> espera 200 Duplicado (idempotência!)
+POST {{host}}/webhooks/pagamento
+Content-Type: application/json
+X-Api-Key: chave-local-de-desenvolvimento
+
+{
+  "id_transacao": "txn-001",
+  "id_contrato": "ctr-100",
+  "valor": 1500.50,
+  "data_pagamento": "2026-09-05T10:00:00Z",
+  "status": "Liquidado"
+}
+
+### 3. Valor negativo e contrato ausente -> espera 422 com dois erros
+POST {{host}}/webhooks/pagamento
+Content-Type: application/json
+X-Api-Key: chave-local-de-desenvolvimento
+
+{
+  "id_transacao": "txn-002",
+  "valor": -50,
+  "data_pagamento": "2026-09-05T10:00:00Z",
+  "status": "Liquidado"
+}
+
+### 4. JSON malformado -> espera 400
+POST {{host}}/webhooks/pagamento
+Content-Type: application/json
+X-Api-Key: chave-local-de-desenvolvimento
+
+{ "id_transacao": "txn-003",
+
+### 51. Evento válido porem sem chave -> espera 401
+POST {{host}}/webhooks/pagamento
+Content-Type: application/json
+
+{
+  "id_transacao": "txn-001",
+  "id_contrato": "ctr-100",
+  "valor": 1500.50,
+  "data_pagamento": "2026-09-05T10:00:00Z",
+  "status": "Liquidado"
+}
+
+
+###

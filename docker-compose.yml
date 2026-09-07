@@ -1,0 +1,38 @@
+# docker-compose.yml
+name: sabemi-webhooks
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: sabemi-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-sabemi_webhooks}
+      POSTGRES_USER: ${POSTGRES_USER:-sabemi}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sabemi_local_dev}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres-dados:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sabemi} -d ${POSTGRES_DB:-sabemi_webhooks}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  adminer:
+    image: adminer:5
+    container_name: sabemi-adminer
+    restart: unless-stopped
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles: [ferramentas]
+
+volumes:
+  postgres-dados:
