@@ -54,11 +54,25 @@ dotnet ef database update --project Infrastructure --startup-project Api
 dotnet run --project Api --launch-profile http
 ```
 
-Para inspecionar o banco, o Adminer sobe em `http://localhost:8080` (servidor: `postgres`):
+Para inspecionar o banco, o Adminer sobe em `http://localhost:8080`:
 
 ```bash
 docker compose --profile ferramentas up -d
 ```
+
+Na tela de login, **troque o sistema para PostgreSQL** — o Adminer abre selecionado em
+MySQL/MariaDB:
+
+| Campo | Valor |
+|---|---|
+| Sistema | PostgreSQL |
+| Servidor | `postgres` |
+| Usuário | `pagamentos` |
+| Senha | `pagamentos_local_dev` |
+| Base de dados | `pagamentos_webhooks` |
+
+O servidor é `postgres`, e não `localhost`, porque o Adminer roda em container e alcança
+o banco pelo nome do serviço na rede do Compose.
 
 Para zerar tudo, incluindo o volume: `docker compose down -v`.
 
