@@ -47,6 +47,9 @@ dotnet ef database update --project Infrastructure --startup-project Api
 dotnet run --project Api --launch-profile http
 ```
 
+Com a API no ar, o Swagger fica em **`http://localhost:5213/swagger`**. Para exercitar o
+`POST`, clique em **Authorize** e informe a ApiKey `chave-local-de-desenvolvimento`.
+
 Para inspecionar o banco, o Adminer sobe em `http://localhost:8080`:
 
 ```bash

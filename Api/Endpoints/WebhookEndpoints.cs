@@ -19,7 +19,17 @@ public static class WebhookEndpoints
             .AddEndpointFilter<FiltroApiKey>();
 
         grupo.MapPost("/pagamento", ReceberPagamento)
-             .WithName("ReceberWebhookPagamento");
+             .WithName("ReceberWebhookPagamento")
+             .WithSummary("Recebe uma notificacao de pagamento do banco parceiro")
+             .WithDescription(
+                 "O corpo e lido cru e gravado integro. Payload que quebra regra de negocio "
+                 + "e persistido com status Falha e devolve 422, para ficar visivel no painel.")
+             .Accepts<RequisicaoWebhookPagamento>("application/json")
+             .Produces(StatusCodes.Status202Accepted)
+             .Produces(StatusCodes.Status200OK)
+             .Produces(StatusCodes.Status400BadRequest)
+             .Produces(StatusCodes.Status401Unauthorized)
+             .Produces(StatusCodes.Status422UnprocessableEntity);
 
         return app;
     }

@@ -10,8 +10,18 @@ public static class EventosEndpoints
     {
         var grupo = app.MapGroup("/api/eventos").WithTags("Eventos");
 
-        grupo.MapGet("/", ListarEventos).WithName("ListarEventos");
-        grupo.MapGet("/{id:guid}", ObterEvento).WithName("ObterEvento");
+        grupo.MapGet("/", ListarEventos)
+             .WithName("ListarEventos")
+             .WithSummary("Lista os eventos recebidos, do mais recente para o mais antigo")
+             .WithDescription(
+                 "Filtro e paginacao sao aplicados no banco, com teto de 100 itens por pagina.")
+             .Produces<ResultadoPaginado<EventoResumoResponse>>(StatusCodes.Status200OK);
+
+        grupo.MapGet("/{id:guid}", ObterEvento)
+             .WithName("ObterEvento")
+             .WithSummary("Detalhe de um evento, com o payload original recebido")
+             .Produces<EventoDetalheResponse>(StatusCodes.Status200OK)
+             .Produces(StatusCodes.Status404NotFound);
 
         return app;
     }

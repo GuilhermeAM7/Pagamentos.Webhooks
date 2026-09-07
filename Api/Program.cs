@@ -1,4 +1,5 @@
 ﻿using Api.Endpoints;
+using Api.OpenApi;
 using Application.DI;
 using Infrastructure;
 using Infrastructure.Security;
@@ -25,13 +26,19 @@ builder.Services.AddCors(opcoes => opcoes.AddPolicy(PoliticaPainel, politica => 
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(opcoes =>
+    opcoes.AddDocumentTransformer<TransformadorSegurancaOpenApi>());
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwaggerUI(opcoes =>
+    {
+        opcoes.SwaggerEndpoint("/openapi/v1.json", "Pagamentos.Webhooks v1");
+        opcoes.DocumentTitle = "Pagamentos.Webhooks";
+    });
 }
 
 app.UseHttpsRedirection();
