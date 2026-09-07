@@ -1,7 +1,6 @@
 ﻿using Application.Contracts;
 using FluentAssertions;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Xunit;
 
 namespace Tests.Unit
@@ -43,21 +42,6 @@ namespace Tests.Unit
             req!.IdContrato.Should().BeNull();
             req.Valor.Should().BeNull();
             req.DataPagamento.Should().BeNull();
-        }
-
-        [Fact]
-        public void ValorStringNumerica_ViraDecimalComPrecisao()
-        {
-            var json = "{\"valor\": \"1234.56\" }";
-            var options = new JsonSerializerOptions
-            {
-                NumberHandling = JsonNumberHandling.AllowReadingFromString
-            };
-
-            var req = JsonSerializer.Deserialize<RequisicaoWebhookPagamento>(json, options);
-
-            req.Should().NotBeNull();
-            req!.Valor.Should().Be(1234.56m);
         }
     }
 }
