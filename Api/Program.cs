@@ -1,4 +1,4 @@
-using Api.Endpoints;
+﻿using Api.Endpoints;
 using Application.DI;
 using Infrastructure;
 using Infrastructure.Security;
@@ -16,6 +16,14 @@ builder.Services.AddOptions<OpcoesSegurancaWebhook>()
     .Validate(o => !string.IsNullOrWhiteSpace(o.ApiKey), "ApiKey do webhook não configurada.")
     .ValidateOnStart();
 
+// O painel roda em outra origem; restrito a ela, nunca AllowAnyOrigin — com
+// AllowAnyOrigin qualquer site aberto no navegador do operador leria os eventos.
+const string PoliticaPainel = "painel";
+builder.Services.AddCors(opcoes => opcoes.AddPolicy(PoliticaPainel, politica => politica
+    .WithOrigins("http://localhost:5173")
+    .AllowAnyHeader()
+    .AllowAnyMethod()));
+
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
@@ -30,7 +38,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors(PoliticaPainel);
+
 app.MapWebhookEndpoints();
+app.MapEventosEndpoints();
 
 app.Run();
 

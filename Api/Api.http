@@ -1,22 +1,11 @@
 @host = http://localhost:5213
+@apiKey = chave-local-de-desenvolvimento
 
-### 1. Evento válido -> espera 202 Accepted
+### 1. Evento valido -> 202 Accepted
+# O header Location aponta para GET /api/eventos/{id} (cenario 7).
 POST {{host}}/webhooks/pagamento
 Content-Type: application/json
-X-Api-Key: chave-local-de-desenvolvimento
-
-{
-  "id_transacao": "txn-006",
-  "id_contrato": "ctr-100",
-  "valor": 1500.50,
-  "data_pagamento": "2026-09-05T10:00:00Z",
-  "status": "Liquidado"
-}
-
-### 2. Mesmo id_transacao -> espera 200 Duplicado (idempotência!)
-POST {{host}}/webhooks/pagamento
-Content-Type: application/json
-X-Api-Key: chave-local-de-desenvolvimento
+X-Api-Key: {{apiKey}}
 
 {
   "id_transacao": "txn-001",
@@ -26,10 +15,25 @@ X-Api-Key: chave-local-de-desenvolvimento
   "status": "Liquidado"
 }
 
-### 3. Valor negativo e contrato ausente -> espera 422 com dois erros
+### 2. MESMO id_transacao do cenario 1 -> 200 Duplicado (idempotencia)
+# Rode o cenario 1 antes. Reenviar quantas vezes quiser: continua 200 e uma unica linha.
 POST {{host}}/webhooks/pagamento
 Content-Type: application/json
-X-Api-Key: chave-local-de-desenvolvimento
+X-Api-Key: {{apiKey}}
+
+{
+  "id_transacao": "txn-001",
+  "id_contrato": "ctr-100",
+  "valor": 1500.50,
+  "data_pagamento": "2026-09-05T10:00:00Z",
+  "status": "Liquidado"
+}
+
+### 3. Valor negativo e contrato ausente -> 422 Unprocessable
+# O evento E GRAVADO com status Falha e o motivo em ultimo_erro. Veja no cenario 6.
+POST {{host}}/webhooks/pagamento
+Content-Type: application/json
+X-Api-Key: {{apiKey}}
 
 {
   "id_transacao": "txn-002",
@@ -38,24 +42,40 @@ X-Api-Key: chave-local-de-desenvolvimento
   "status": "Liquidado"
 }
 
-### 4. JSON malformado -> espera 400
+### 4. JSON malformado -> 400 Bad Request (ilegivel, nao ha o que gravar)
 POST {{host}}/webhooks/pagamento
 Content-Type: application/json
-X-Api-Key: chave-local-de-desenvolvimento
+X-Api-Key: {{apiKey}}
 
 { "id_transacao": "txn-003",
 
-### 51. Evento válido porem sem chave -> espera 401
+### 5. Sem ApiKey -> 401 Unauthorized (rejeitado na porta)
 POST {{host}}/webhooks/pagamento
 Content-Type: application/json
 
 {
-  "id_transacao": "txn-001",
+  "id_transacao": "txn-004",
   "id_contrato": "ctr-100",
   "valor": 1500.50,
   "data_pagamento": "2026-09-05T10:00:00Z",
   "status": "Liquidado"
 }
 
+### 6. Painel: so os eventos que falharam, com o motivo
+GET {{host}}/api/eventos?status=Falha
+Accept: application/json
+
+### 7. Painel: detalhe de um evento, com o payload original integro
+# Troque o GUID pelo eventoId devolvido no cenario 1.
+GET {{host}}/api/eventos/00000000-0000-0000-0000-000000000000
+Accept: application/json
+
+### 8. Painel: filtro por contrato, paginado
+GET {{host}}/api/eventos?idContrato=ctr-100&pagina=1&tamanhoPagina=20
+Accept: application/json
+
+### 9. Painel: teto de pagina aplicado no servidor (devolve tamanhoPagina = 100)
+GET {{host}}/api/eventos?tamanhoPagina=1000000
+Accept: application/json
 
 ###

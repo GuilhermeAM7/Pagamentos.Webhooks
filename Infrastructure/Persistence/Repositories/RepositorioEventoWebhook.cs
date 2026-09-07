@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions;
+using Application.Contracts;
 using Application.Domain.Entities;
 using Application.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -59,6 +60,64 @@ namespace Infrastructure.Persistence.Repositories
                 .Take(maximo)
                 .Select(e => e.Id)
                 .ToListAsync(ct);
+        }
+
+        public async Task<ResultadoPaginado<EventoResumoResponse>> ListarAsync(
+            FiltroEventos filtro, CancellationToken ct)
+        {
+            var f = filtro.Normalizar();
+
+            var consulta = contexto.Eventos.AsNoTracking();
+
+            if (f.Status is { } status)
+                consulta = consulta.Where(e => e.Status == status);
+
+            if (f.IdContrato is { } contrato)
+                consulta = consulta.Where(e => e.IdContrato == contrato);
+
+            var total = await consulta.CountAsync(ct);
+
+            // Projeção explícita: a listagem nunca carrega payload_json. Materializar a
+            // entidade inteira traria um jsonb por linha para exibir uma tabela.
+            // O desempate por Id evita que uma linha pule de página quando duas
+            // compartilham o mesmo data_recebido.
+            var linhas = await consulta
+                .OrderByDescending(e => e.DataRecebido)
+                .ThenBy(e => e.Id)
+                .Skip((f.Pagina - 1) * f.TamanhoPagina)
+                .Take(f.TamanhoPagina)
+                .Select(e => new
+                {
+                    e.Id,
+                    e.IdTransacao,
+                    e.IdContrato,
+                    e.Valor,
+                    e.DataPagamento,
+                    e.DataRecebido,
+                    e.DataProcessado,
+                    e.Status,
+                    e.StatusPagamento,
+                    e.Tentativas,
+                    e.UltimoErro
+                })
+                .ToListAsync(ct);
+
+            // ToString() dos enums fica fora da consulta: com HasConversion<string>() o
+            // EF nao garante traducao dessa chamada para SQL.
+            var itens = linhas.ConvertAll(l => new EventoResumoResponse(
+                l.Id,
+                l.IdTransacao,
+                l.IdContrato,
+                l.Valor,
+                l.DataPagamento,
+                l.DataRecebido,
+                l.DataProcessado,
+                l.Status.ToString(),
+                l.StatusPagamento?.ToString(),
+                l.Tentativas,
+                l.UltimoErro));
+
+            return new ResultadoPaginado<EventoResumoResponse>(itens, f.Pagina, f.TamanhoPagina, total);
         }
 
         private static bool EhDuplicidadeDeTransacao(DbUpdateException ex) =>

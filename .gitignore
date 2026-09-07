@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# Guia de trabalho local, fora da entrega publica
+CLAUDE.md

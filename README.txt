@@ -1,1 +1,0 @@
-A ApiKey de desenvolvimento está no appsettings.Development.json para o projeto rodar sem configuração. Em produção ela vem da variável SegurancaWebhook__ApiKey; localmente pode ser sobrescrita por User Secrets.
