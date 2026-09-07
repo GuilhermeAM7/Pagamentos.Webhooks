@@ -21,7 +21,12 @@ Tests/            Unit/, Integration/, Fixtures/
 
 ## Como rodar
 
-Pré-requisitos: .NET 10 SDK e Docker.
+Pré-requisitos: .NET 10 SDK e Docker, mais a ferramenta de linha de comando do EF Core,
+usada para aplicar as migrations:
+
+```bash
+dotnet tool install --global dotnet-ef
+```
 
 **1. Subir o banco** (aguarde ficar healthy):
 
@@ -29,7 +34,13 @@ Pré-requisitos: .NET 10 SDK e Docker.
 docker compose up -d
 ```
 
-**2. Aplicar as migrations:**
+**2. Restaurar as dependências:**
+
+```bash
+dotnet restore
+```
+
+**3. Aplicar as migrations:**
 
 ```bash
 # PowerShell:  $env:ASPNETCORE_ENVIRONMENT = "Development"
@@ -37,7 +48,7 @@ docker compose up -d
 dotnet ef database update --project Infrastructure --startup-project Api
 ```
 
-**3. Subir a API** em `http://localhost:5213`:
+**4. Subir a API** em `http://localhost:5213`:
 
 ```bash
 dotnet run --project Api --launch-profile http
