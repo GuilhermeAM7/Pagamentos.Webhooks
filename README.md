@@ -92,12 +92,16 @@ dotnet test --filter "Categoria=Integracao"
 
 ## API
 
-O arquivo `Api/Api.http` contém todos os cenários abaixo prontos para execução no Visual
-Studio, VS Code ou Rider.
+Três endpoints. Com a aplicação rodando, o Swagger em `/swagger` documenta os schemas e
+permite executar cada um.
 
-### POST /webhooks/pagamento
+| Método | Rota | Descrição |
+|---|---|---|
+| `POST` | `/webhooks/pagamento` | Recebe a notificação do parceiro. Exige o header `X-Api-Key` |
+| `GET` | `/api/eventos` | Lista os eventos. Filtros: `status`, `idContrato`, `pagina`, `tamanhoPagina` |
+| `GET` | `/api/eventos/{id}` | Detalhe de um evento, com o payload original recebido |
 
-Recebe a notificação. Header obrigatório: `X-Api-Key`.
+Corpo do `POST`:
 
 ```json
 {
@@ -112,97 +116,22 @@ Recebe a notificação. Header obrigatório: `X-Api-Key`.
 `id_transacao` é a chave de idempotência. Campos não previstos no contrato são aceitos e
 preservados no payload gravado.
 
-| Código | Situação |
-|---|---|
-| `202 Accepted` | Aceito e enfileirado para processamento |
-| `200 OK` | `id_transacao` já recebido antes; devolve o evento original |
-| `422 Unprocessable Entity` | Regra de negócio violada; o evento é gravado com status `Falha` e o motivo |
-| `400 Bad Request` | JSON malformado ou `id_transacao` ausente |
-| `401 Unauthorized` | ApiKey ausente ou inválida |
-
-Resposta do `202`, com `Location: /api/eventos/{id}`:
-
-```json
-{ "eventoId": "fae9417e-ca1f-4acd-904d-ac21ce6b310a", "situacao": "Aceito" }
-```
-
-Resposta do `422`:
-
-```json
-{
-  "eventoId": "22b6184b-d849-4bbb-888c-3aa9bd4b7a91",
-  "situacao": "Rejeitado",
-  "erros": "id_contrato é obrigatório. | valor deve ser maior que zero (recebido: -50)."
-}
-```
-
-### GET /api/eventos
-
-Lista os eventos recebidos, do mais recente para o mais antigo.
-
-| Parâmetro | Padrão | Observação |
+| Código | Situação | Gravou? |
 |---|---|---|
-| `status` | — | `Pendente`, `EmProcessamento`, `Concluido` ou `Falha` |
-| `idContrato` | — | Filtro exato |
-| `pagina` | `1` | |
-| `tamanhoPagina` | `20` | Limitado a 100 |
+| `202 Accepted` | Aceito e enfileirado para processamento | sim |
+| `200 OK` | `id_transacao` já recebido antes; devolve o evento original | não |
+| `422 Unprocessable Entity` | Regra de negócio violada | **sim**, com status `Falha` e o motivo |
+| `400 Bad Request` | JSON malformado ou `id_transacao` ausente | não |
+| `401 Unauthorized` | ApiKey ausente ou inválida | não |
 
-```
-GET /api/eventos?status=Falha&idContrato=ctr-100&pagina=1&tamanhoPagina=20
-```
+O `422` grava de propósito: um payload que o parceiro mandou errado é a informação mais
+útil para o operador. Consulte `GET /api/eventos?status=Falha` para vê-los com o motivo
+em `ultimoErro`.
 
-```json
-{
-  "itens": [
-    {
-      "id": "22b6184b-d849-4bbb-888c-3aa9bd4b7a91",
-      "idTransacao": "txn-002",
-      "idContrato": "ctr-100",
-      "valor": -50.0,
-      "dataPagamento": "2026-09-05T10:00:00+00:00",
-      "dataRecebido": "2026-09-07T04:19:25.500799+00:00",
-      "dataProcessado": null,
-      "status": "Falha",
-      "statusPagamento": "Liquidado",
-      "tentativas": 0,
-      "ultimoErro": "id_contrato é obrigatório. | valor deve ser maior que zero (recebido: -50)."
-    }
-  ],
-  "pagina": 1,
-  "tamanhoPagina": 20,
-  "total": 1,
-  "totalPaginas": 1
-}
-```
+A listagem é paginada no banco, com teto de 100 itens por página.
 
-### GET /api/eventos/{id}
-
-Detalhe de um evento. Além dos campos do resumo, traz `statusOrigem` e o payload original
-recebido, em `payload`. Retorna `404` se o evento não existir.
-
-```json
-{
-  "id": "fae9417e-ca1f-4acd-904d-ac21ce6b310a",
-  "idTransacao": "txn-009",
-  "idContrato": "ctr-100",
-  "valor": 10.0,
-  "dataPagamento": "2026-09-05T10:00:00+00:00",
-  "dataRecebido": "2026-09-07T04:19:27.118204+00:00",
-  "dataProcessado": "2026-09-07T04:19:29.495018+00:00",
-  "statusOrigem": "Liquidado",
-  "status": "Concluido",
-  "statusPagamento": "Liquidado",
-  "tentativas": 1,
-  "ultimoErro": null,
-  "payload": {
-    "id_transacao": "txn-009",
-    "id_contrato": "ctr-100",
-    "valor": 10,
-    "data_pagamento": "2026-09-05T10:00:00Z",
-    "status": "Liquidado"
-  }
-}
-```
+O arquivo `Api/Api.http` traz os nove cenários prontos para execução no Visual Studio,
+VS Code ou Rider.
 
 ## Estrutura
 
