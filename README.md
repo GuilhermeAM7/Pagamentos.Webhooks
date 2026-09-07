@@ -129,11 +129,15 @@ em `ultimoErro`.
 
 A listagem é paginada no banco, com teto de 100 itens por página.
 
+O arquivo `Api/Api.http` traz os nove cenários prontos para execução no Visual Studio,
+VS Code ou Rider.
+
+
+
 O CORS está habilitado apenas para a origem `http://localhost:5173`, do painel
 administrativo.
 
-O arquivo `Api/Api.http` traz os nove cenários prontos para execução no Visual Studio,
-VS Code ou Rider.
+
 
 ## Estrutura
 
