@@ -12,13 +12,6 @@ Escopo entregue: backend.
 - EF Core + Npgsql
 - xUnit, FluentAssertions e Testcontainers
 
-```
-Api/              endpoints, filtros, Program.cs
-Application/      domínio, contratos, serviços, validação, worker
-Infrastructure/   EF Core, repositórios, mensageria, segurança
-Tests/            Unit/, Integration/, Fixtures/
-```
-
 ## Como rodar
 
 Pré-requisitos: .NET 10 SDK e Docker, mais a ferramenta de linha de comando do EF Core,
@@ -206,4 +199,13 @@ recebido, em `payload`. Retorna `404` se o evento não existir.
     "status": "Liquidado"
   }
 }
+```
+
+## Estrutura
+
+```
+Api/              endpoints, filtros, Program.cs
+Application/      domínio, contratos, serviços, validação, worker
+Infrastructure/   EF Core, repositórios, mensageria, segurança
+Tests/            Unit/, Integration/, Fixtures/
 ```
