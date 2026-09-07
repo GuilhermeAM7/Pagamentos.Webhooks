@@ -2,7 +2,7 @@
 using Application.Contracts;
 using Application.Domain.Entities;
 using Microsoft.Extensions.Logging;
-using Sabemi.Webhooks.TesteTecnico.Application.Validation;
+using Application.Validation;
 
 namespace Application.Services;
 

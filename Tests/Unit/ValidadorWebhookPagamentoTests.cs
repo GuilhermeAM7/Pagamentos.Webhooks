@@ -3,7 +3,7 @@ using Application.Contracts;
 using FluentAssertions;
 using System;
 using Xunit;
-using Sabemi.Webhooks.TesteTecnico.Application.Validation;
+using Application.Validation;
 
 namespace Tests.Unit
 {

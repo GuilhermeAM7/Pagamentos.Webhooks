@@ -1,21 +1,21 @@
 # docker-compose.yml
-name: sabemi-webhooks
+name: pagamentos-webhooks
 
 services:
   postgres:
     image: postgres:17-alpine
-    container_name: sabemi-postgres
+    container_name: pagamentos-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-sabemi_webhooks}
-      POSTGRES_USER: ${POSTGRES_USER:-sabemi}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sabemi_local_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-pagamentos_webhooks}
+      POSTGRES_USER: ${POSTGRES_USER:-pagamentos}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pagamentos_local_dev}
     ports:
       - "${POSTGRES_PORT:-5433}:5432"
     volumes:
       - postgres-dados:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sabemi} -d ${POSTGRES_DB:-sabemi_webhooks}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-pagamentos} -d ${POSTGRES_DB:-pagamentos_webhooks}"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -23,7 +23,7 @@ services:
 
   adminer:
     image: adminer:5
-    container_name: sabemi-adminer
+    container_name: pagamentos-adminer
     restart: unless-stopped
     environment:
       ADMINER_DEFAULT_SERVER: postgres

@@ -2,7 +2,7 @@
 using Application.Contracts;
 using Application.Domain.Enums;
 
-namespace Sabemi.Webhooks.TesteTecnico.Application.Validation;
+namespace Application.Validation;
 
 public sealed class ValidadorWebhookPagamento(TimeProvider relogio)
 {

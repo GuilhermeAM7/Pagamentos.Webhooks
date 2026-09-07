@@ -1,4 +1,4 @@
-# Sabemi — Serviço de Webhooks de Pagamento
+# Pagamentos.Webhooks
 
 Recebe notificações de pagamento de um banco parceiro, garante que o mesmo evento não
 seja processado duas vezes, processa em background e expõe os eventos para consulta.

@@ -1,7 +1,7 @@
 ﻿using Application.Services;
 using Application.Workers;
 using Microsoft.Extensions.DependencyInjection;
-using Sabemi.Webhooks.TesteTecnico.Application.Validation;
+using Application.Validation;
 
 namespace Application.DI;
 
