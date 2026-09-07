@@ -7,12 +7,14 @@ public sealed class TransformadorSegurancaOpenApi : IOpenApiDocumentTransformer
 {
     public const string NomeEsquema = "ApiKey";
 
+    public const string Titulo = "Pagamentos.Webhooks";
+
     public Task TransformAsync(
         OpenApiDocument documento,
         OpenApiDocumentTransformerContext contexto,
         CancellationToken ct)
     {
-        documento.Info.Title = "Pagamentos.Webhooks";
+        documento.Info.Title = Titulo;
         documento.Info.Description =
             "Recebe notificacoes de pagamento de um banco parceiro, garante idempotencia por "
             + "id_transacao, processa em background e expoe os eventos para consulta.";

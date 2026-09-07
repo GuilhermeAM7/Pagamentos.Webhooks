@@ -1,8 +1,7 @@
-﻿using Api.Endpoints;
-using Api.OpenApi;
+﻿using Api.DI;
+using Api.Endpoints;
 using Application.DI;
 using Infrastructure;
-using Infrastructure.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,38 +11,21 @@ if (builder.Environment.IsDevelopment()
     throw new InvalidOperationException("Connection string 'Postgres' não configurada.");
 }
 
-builder.Services.AddOptions<OpcoesSegurancaWebhook>()
-    .Bind(builder.Configuration.GetSection(OpcoesSegurancaWebhook.Secao))
-    .Validate(o => !string.IsNullOrWhiteSpace(o.ApiKey), "ApiKey do webhook não configurada.")
-    .ValidateOnStart();
-
-const string PoliticaPainel = "painel";
-builder.Services.AddCors(opcoes => opcoes.AddPolicy(PoliticaPainel, politica => politica
-    .WithOrigins("http://localhost:5173")
-    .AllowAnyHeader()
-    .AllowAnyMethod()));
+builder.Services.AddSegurancaWebhook(builder.Configuration);
+builder.Services.AddCorsPainel();
 
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
-builder.Services.AddOpenApi(opcoes =>
-    opcoes.AddDocumentTransformer<TransformadorSegurancaOpenApi>());
+builder.Services.AddOpenApiDocumentado();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.UseSwaggerUI(opcoes =>
-    {
-        opcoes.SwaggerEndpoint("/openapi/v1.json", "Pagamentos.Webhooks v1");
-        opcoes.DocumentTitle = "Pagamentos.Webhooks";
-    });
-}
+app.UseSwaggerEmDesenvolvimento();
 
 app.UseHttpsRedirection();
 
-app.UseCors(PoliticaPainel);
+app.UseCorsPainel();
 
 app.MapWebhookEndpoints();
 app.MapEventosEndpoints();
