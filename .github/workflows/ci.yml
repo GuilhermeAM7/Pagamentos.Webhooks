@@ -58,9 +58,10 @@ jobs:
           --results-directory ./resultados
 
       - name: Publicar resultados dos testes
-        if: always()
+        if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: resultados-dos-testes
           path: ./resultados
+          if-no-files-found: ignore
           retention-days: 7
